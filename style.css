@@ -1,0 +1,62 @@
+body {
+font-family: Arial, sans-serif;
+margin: 0;
+background: #f4f6f9;
+}
+ 
+.nav {
+display: flex;
+justify-content: space-between;
+padding: 10px 20px;
+background: #4caf50;
+color: white;
+}
+ 
+button {
+margin: 5px;
+padding: 8px 12px;
+border: none;
+border-radius: 8px;
+background: #333;
+color: white;
+cursor: pointer;
+transition: 0.3s;
+}
+ 
+button:hover {
+background: #555;
+}
+ 
+.page { padding: 20px; }
+.hidden { display: none; }
+ 
+#plannerGrid {
+display: grid;
+grid-template-columns: repeat(7, 1fr);
+gap: 10px;
+}
+ 
+.card {
+background: white;
+padding: 10px;
+border-radius: 12px;
+box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+min-height: 150px;
+}
+ 
+#recipesContainer {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
+gap: 15px;
+}
+ 
+img {
+width: 100%;
+border-radius: 10px;
+}
+ 
+@media (max-width: 600px) {
+#plannerGrid {
+grid-template-columns: 1fr;
+}
+}
