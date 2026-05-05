@@ -1,223 +1,818 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MealMind AI | Student Meal Planner</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@400;500&display=swap');
-        
-        :root {
-            --cream: #FDFAF4; --sage: #2D4A3E; --sage-light: #4A7A6A; --sage-pale: #E8F0EC;
-            --amber: #C8860A; --amber-light: #FFF3D6; --white: #FFFFFF;
-            --text: #1A2B24; --muted: #6B8A7A; --border: #D4E0D8;
-            --radius: 12px; --font-head: 'Fraunces', serif; --font-body: 'DM Sans', sans-serif;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MealMind — AI Meal Planner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;1,400;1,500&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --cream:#FDFAF4;--sage:#2D4A3E;--sage-light:#4A7A6A;--sage-pale:#E8F0EC;
+  --amber:#C8860A;--amber-light:#FFF3D6;--white:#FFFFFF;
+  --text:#1A2B24;--muted:#6B8A7A;--border:#D4E0D8;--red:#c0392b;
+  --radius:12px;--font-head:'Fraunces',serif;--font-body:'DM Sans',sans-serif;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);background:var(--cream);color:var(--text);min-height:100vh}
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: var(--font-body); background: var(--cream); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+/* NAV */
+nav{background:var(--sage);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,0.15)}
+.logo{font-family:var(--font-head);font-size:22px;color:#fff;font-style:italic;letter-spacing:-0.5px;text-decoration:none;display:flex;flex-direction:column;gap:2px}
+.logo-sub{font-style:normal;color:#9FCFBF;font-size:11px;font-family:var(--font-body);letter-spacing:1.5px;text-transform:uppercase}
+.nav-tabs{display:flex;gap:4px}
+.nav-tab{background:none;border:none;color:rgba(255,255,255,0.65);font-family:var(--font-body);font-size:14px;padding:8px 16px;border-radius:8px;cursor:pointer;transition:all 0.2s}
+.nav-tab:hover{color:#fff;background:rgba(255,255,255,0.1)}
+.nav-tab.active{color:#fff;background:rgba(255,255,255,0.18)}
+.nav-right{display:flex;align-items:center;gap:10px}
+.api-indicator{display:flex;align-items:center;gap:6px;font-size:12px;color:rgba(255,255,255,0.6);cursor:pointer;padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);transition:all 0.2s}
+.api-indicator:hover{background:rgba(255,255,255,0.1);color:#fff}
+.api-dot{width:8px;height:8px;border-radius:50%;background:#ef4444;flex-shrink:0;transition:background 0.3s}
+.api-dot.connected{background:#22c55e}
+.nav-user{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.75);font-size:13px;cursor:pointer}
+.avatar{width:32px;height:32px;border-radius:50%;background:#9FCFBF;display:flex;align-items:center;justify-content:center;font-weight:500;font-size:12px;color:var(--sage)}
 
-        /* NAVIGATION - Updated for Mobile */
-        nav { 
-            background: var(--sage); 
-            padding: 0 1.5rem; 
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between; 
-            height: 70px; 
-            position: sticky; 
-            top: 0; 
-            z-index: 100; 
-        }
-        .logo { font-family: var(--font-head); font-size: 20px; color: #fff; font-style: italic; }
-        .logo span { font-style: normal; color: #9FCFBF; font-size: 11px; display: block; text-transform: uppercase; }
+/* PAGES */
+.page{display:none;padding:2rem;max-width:980px;margin:0 auto;animation:fadeIn 0.3s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
-        .menu-btn { display: none; background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
+/* HOME */
+.hero{text-align:center;padding:4rem 1rem 2.5rem}
+.hero h1{font-family:var(--font-head);font-size:56px;color:var(--sage);line-height:1.1;margin-bottom:0.5rem}
+.hero h1 em{color:var(--amber);font-style:italic}
+.hero p{color:var(--muted);font-size:18px;max-width:540px;margin:1rem auto 2rem;line-height:1.7}
+.feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:1.5rem}
+.feat-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;text-align:left;transition:transform 0.2s,box-shadow 0.2s}
+.feat-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(45,74,62,0.1)}
+.feat-icon{width:44px;height:44px;border-radius:12px;background:var(--sage-pale);display:flex;align-items:center;justify-content:center;margin-bottom:0.75rem;font-size:22px}
+.feat-card h3{font-size:15px;font-weight:500;color:var(--text);margin-bottom:0.4rem}
+.feat-card p{font-size:13px;color:var(--muted);line-height:1.6}
+.cta-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.cta-btn{background:var(--sage);color:#fff;border:none;padding:14px 32px;border-radius:10px;font-family:var(--font-body);font-size:16px;font-weight:500;cursor:pointer;transition:all 0.2s}
+.cta-btn:hover{background:var(--sage-light);transform:translateY(-1px)}
+.cta-btn.outline{background:none;color:var(--sage);border:1.5px solid var(--sage)}
+.cta-btn.outline:hover{background:var(--sage-pale)}
 
-        .nav-tabs { display: flex; gap: 8px; }
-        .nav-tab { 
-            background: none; border: none; color: rgba(255,255,255,0.7); 
-            font-size: 14px; padding: 8px 12px; border-radius: 8px; 
-            cursor: pointer; transition: 0.2s; 
-        }
-        .nav-tab.active { color: #fff; background: rgba(255,255,255,0.15); }
+/* CARDS & LAYOUT */
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem}
+.card-title{font-size:12px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:1rem}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+.page-title{font-family:var(--font-head);font-size:36px;color:var(--sage);margin-bottom:0.25rem}
+.page-sub{color:var(--muted);font-size:15px;margin-bottom:2rem;line-height:1.6}
 
-        /* Mobile Layout */
-        @media (max-width: 768px) {
-            .menu-btn { display: block; }
-            .nav-tabs { 
-                position: absolute; top: 70px; left: 0; width: 100%; 
-                flex-direction: column; background: var(--sage); 
-                padding: 1rem; border-top: 1px solid rgba(255,255,255,0.1);
-                display: none; 
-            }
-            .nav-tabs.open { display: flex; }
-            .hero h1 { font-size: 42px !important; }
-            .feature-grid, .week-grid { grid-template-columns: 1fr !important; }
-            .plan-summary { grid-template-columns: 1fr 1fr !important; }
-            .card { padding: 1rem; }
-        }
+/* INGREDIENTS */
+.tag-input-wrap{display:flex;gap:8px;margin-bottom:0.75rem}
+.tag-input-wrap input{flex:1;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:var(--font-body);font-size:14px;background:var(--cream);color:var(--text);outline:none;transition:border-color 0.2s}
+.tag-input-wrap input:focus{border-color:var(--sage-light)}
+.add-btn{background:var(--sage);color:#fff;border:none;padding:10px 16px;border-radius:8px;font-size:14px;cursor:pointer;font-family:var(--font-body);transition:background 0.2s}
+.add-btn:hover{background:var(--sage-light)}
+.tags{display:flex;flex-wrap:wrap;gap:6px;min-height:36px}
+.tag{background:var(--sage-pale);color:var(--sage);padding:5px 10px;border-radius:20px;font-size:13px;display:flex;align-items:center;gap:5px}
+.tag button{background:none;border:none;color:var(--sage-light);cursor:pointer;font-size:16px;line-height:1;padding:0;transition:color 0.2s}
+.tag button:hover{color:var(--red)}
+.quick-tag{background:none;border:1px solid var(--border);color:var(--muted);padding:4px 10px;border-radius:20px;font-size:12px;cursor:pointer;font-family:var(--font-body);transition:all 0.2s}
+.quick-tag:hover{border-color:var(--sage);color:var(--sage);background:var(--sage-pale)}
 
-        /* PAGE SYSTEM */
-        .page { display: none; padding: 1.5rem; max-width: 1000px; margin: 0 auto; animation: slideUp 0.3s ease; }
-        .page.active { display: block; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+/* PREFERENCES */
+.pref-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
+.pref-row:last-child{border-bottom:none}
+.pref-label{font-size:14px;color:var(--text)}
+select,input[type=text],input[type=number],input[type=password],input[type=email]{padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-family:var(--font-body);font-size:13px;background:var(--cream);color:var(--text);outline:none;transition:border-color 0.2s}
+select:focus,input:focus{border-color:var(--sage-light)}
 
-        /* CARDS */
-        .card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1rem; }
-        .hero { text-align: center; padding: 3rem 1rem; }
-        .hero h1 { font-family: var(--font-head); font-size: 56px; color: var(--sage); margin-bottom: 1rem; line-height: 1.1; }
-        .hero em { color: var(--amber); font-style: italic; }
+.gen-btn{width:100%;background:var(--sage);color:#fff;border:none;padding:15px;border-radius:10px;font-family:var(--font-head);font-size:20px;font-style:italic;cursor:pointer;margin-top:1.5rem;transition:all 0.2s;letter-spacing:-0.3px}
+.gen-btn:hover:not(:disabled){background:var(--sage-light);transform:translateY(-1px)}
+.gen-btn:disabled{opacity:0.55;cursor:not-allowed}
 
-        .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
-        .feat-card { background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; }
+/* LOADING */
+.loading{text-align:center;padding:3rem;color:var(--muted)}
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--sage);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 1rem}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-        /* PLANNER GRID */
-        .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-top: 1.5rem; }
-        .day-col { background: #fff; border: 1px solid var(--border); border-radius: 8px; min-height: 120px; overflow: hidden; }
-        .day-header { background: var(--sage); color: white; padding: 6px; text-align: center; font-size: 12px; font-weight: bold; }
-        .meal-entry { padding: 8px; border-bottom: 1px solid #f0f0f0; font-size: 12px; }
+/* RECIPE CARDS */
+.recipe-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:1.75rem;margin-bottom:1.25rem;animation:fadeIn 0.4s ease}
+.recipe-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.25rem;gap:1rem}
+.recipe-name{font-family:var(--font-head);font-size:26px;color:var(--sage);line-height:1.2}
+.recipe-meta{display:flex;gap:1rem;font-size:13px;color:var(--muted);margin-top:6px;flex-wrap:wrap}
+.badge{background:var(--amber-light);color:var(--amber);padding:4px 10px;border-radius:20px;font-size:12px;font-weight:500}
+.cost-big{font-family:var(--font-head);font-size:30px;color:var(--text);text-align:right;white-space:nowrap}
+.cost-big small{font-size:12px;font-family:var(--font-body);color:var(--muted);display:block;text-align:right}
+.two-col-recipe{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:1rem}
+.section-label{font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:0.6rem}
+.ingredient-list{list-style:none}
+.ingredient-list li{font-size:14px;color:var(--text);padding:6px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:8px}
+.ingredient-list li:last-child{border-bottom:none}
+.ing-right{text-align:right}
+.store-price{color:var(--amber);font-size:12px;font-weight:500}
+.store-name{color:var(--muted);font-size:11px}
+.steps-list{padding-left:1.2rem}
+.steps-list li{font-size:14px;color:var(--text);line-height:1.7;margin-bottom:0.5rem}
+.recipe-actions{display:flex;gap:8px;margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--border);flex-wrap:wrap}
+.action-btn{border:1px solid var(--border);background:none;padding:9px 16px;border-radius:8px;font-size:13px;font-family:var(--font-body);cursor:pointer;color:var(--text);transition:all 0.2s}
+.action-btn:hover{background:var(--sage-pale);border-color:var(--sage-light)}
+.action-btn.primary{background:var(--sage);color:#fff;border-color:var(--sage)}
+.action-btn.primary:hover{background:var(--sage-light)}
 
-        .btn { 
-            width: 100%; padding: 14px; background: var(--sage); color: white; 
-            border: none; border-radius: 10px; font-family: var(--font-head); 
-            font-size: 16px; cursor: pointer; transition: 0.2s; 
-        }
-        .btn:active { transform: scale(0.98); }
-        input { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 1rem; }
+/* WEEK PLANNER */
+.plan-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem}
+.sum-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;text-align:center}
+.sum-num{font-family:var(--font-head);font-size:30px;color:var(--sage);display:block}
+.sum-label{font-size:12px;color:var(--muted);margin-top:4px}
+.week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:1.5rem}
+.day-col{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;min-height:220px}
+.day-head{background:var(--sage);color:#fff;font-size:11px;font-weight:500;text-align:center;padding:10px 4px;text-transform:uppercase;letter-spacing:0.8px}
+.day-head.today{background:var(--amber)}
+.meal-slot{padding:8px;border-bottom:1px solid var(--border);min-height:58px;cursor:pointer;transition:background 0.2s}
+.meal-slot:hover{background:var(--sage-pale)}
+.meal-slot:last-of-type{border-bottom:none}
+.meal-type{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px}
+.meal-name-cell{font-size:11px;color:var(--text);line-height:1.4}
+.meal-cost-cell{font-size:10px;color:var(--amber);margin-top:2px}
+.empty-slot{color:var(--border);font-size:11px}
+.add-meal-btn{width:100%;background:none;border:none;padding:8px;font-size:20px;color:var(--border);cursor:pointer;transition:color 0.2s}
+.add-meal-btn:hover{color:var(--sage)}
+.plan-actions{display:flex;gap:8px;flex-wrap:wrap}
 
-    </style>
+/* STORES */
+.zip-row{display:flex;gap:10px;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap}
+.zip-btn{background:var(--sage);color:#fff;border:none;padding:10px 20px;border-radius:8px;font-family:var(--font-body);font-size:14px;cursor:pointer;transition:background 0.2s}
+.zip-btn:hover{background:var(--sage-light)}
+.stores-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem}
+.store-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;display:flex;gap:1rem;align-items:flex-start;transition:transform 0.2s}
+.store-card:hover{transform:translateY(-2px)}
+.store-icon{width:48px;height:48px;border-radius:12px;background:var(--sage-pale);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.store-info h3{font-size:15px;font-weight:500;margin-bottom:4px}
+.store-info p{font-size:13px;color:var(--muted);margin-bottom:8px}
+.store-tags{display:flex;gap:5px;flex-wrap:wrap}
+.store-tag{background:var(--sage-pale);color:var(--sage);font-size:11px;padding:3px 8px;border-radius:10px}
+.cheapest-badge{background:var(--amber-light);color:var(--amber);font-size:11px;padding:3px 8px;border-radius:10px;font-weight:500}
+
+/* AI CHAT */
+.chat-wrap{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);display:flex;flex-direction:column;height:480px}
+.chat-messages{flex:1;overflow-y:auto;padding:1.25rem;display:flex;flex-direction:column;gap:1rem}
+.msg{max-width:80%;line-height:1.6;font-size:14px;padding:10px 14px;border-radius:12px}
+.msg.user{background:var(--sage);color:#fff;align-self:flex-end;border-radius:12px 12px 4px 12px}
+.msg.assistant{background:var(--sage-pale);color:var(--text);align-self:flex-start;border-radius:12px 12px 12px 4px}
+.msg.assistant strong{color:var(--sage)}
+.chat-input-row{display:flex;gap:8px;padding:1rem;border-top:1px solid var(--border)}
+.chat-input-row input{flex:1;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:var(--font-body);font-size:14px;background:var(--cream);color:var(--text);outline:none}
+.chat-input-row input:focus{border-color:var(--sage-light)}
+.chat-send{background:var(--sage);color:#fff;border:none;padding:10px 18px;border-radius:8px;font-family:var(--font-body);font-size:14px;cursor:pointer;transition:background 0.2s}
+.chat-send:hover:not(:disabled){background:var(--sage-light)}
+.chat-send:disabled{opacity:0.5;cursor:not-allowed}
+.chat-suggestions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1.5rem}
+.suggestion-btn{background:var(--white);border:1px solid var(--border);padding:8px 14px;border-radius:20px;font-size:13px;font-family:var(--font-body);cursor:pointer;color:var(--sage);transition:all 0.2s}
+.suggestion-btn:hover{background:var(--sage-pale);border-color:var(--sage)}
+
+/* API KEY MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:center;justify-content:center;padding:1rem}
+.modal-bg.open{display:flex}
+.modal{background:var(--white);border-radius:16px;padding:2rem;width:440px;max-width:100%;position:relative}
+.modal h2{font-family:var(--font-head);font-size:26px;color:var(--sage);margin-bottom:0.25rem}
+.modal p{font-size:14px;color:var(--muted);margin-bottom:1.5rem;line-height:1.6}
+.form-row{margin-bottom:1rem}
+.form-row label{display:block;font-size:13px;font-weight:500;color:var(--muted);margin-bottom:5px}
+.form-row input{width:100%;padding:11px 14px;border:1px solid var(--border);border-radius:8px;font-family:var(--font-body);font-size:14px;background:var(--cream);color:var(--text);outline:none}
+.form-row input:focus{border-color:var(--sage-light)}
+.modal-btn{width:100%;background:var(--sage);color:#fff;border:none;padding:13px;border-radius:8px;font-family:var(--font-body);font-size:15px;font-weight:500;cursor:pointer;transition:background 0.2s;margin-top:0.5rem}
+.modal-btn:hover{background:var(--sage-light)}
+.modal-close{position:absolute;top:1rem;right:1rem;background:none;border:none;font-size:24px;color:var(--muted);cursor:pointer;line-height:1;padding:4px}
+.api-note{background:var(--amber-light);border:1px solid #f0c97a;border-radius:8px;padding:10px 14px;font-size:12px;color:#7a5200;margin-top:1rem;line-height:1.5}
+.api-note a{color:var(--amber);text-decoration:underline}
+.error-msg{background:#fee2e2;border:1px solid #fca5a5;border-radius:8px;padding:10px 14px;font-size:13px;color:var(--red);margin-top:1rem;display:none}
+
+/* LOGIN MODAL */
+.login-modal{background:var(--white);border-radius:16px;padding:2rem;width:380px;max-width:100%;position:relative}
+
+/* PRINT */
+@media print{
+  nav,.plan-actions,.chat-suggestions,.recipe-actions,.gen-btn,.cta-btn{display:none!important}
+  .page{display:block!important;padding:0}
+  .page:not(.active){display:none!important}
+  body{background:#fff}
+}
+
+/* RESPONSIVE */
+@media(max-width:700px){
+  nav{padding:0 1rem}
+  .nav-tabs{display:none}
+  .feature-grid{grid-template-columns:1fr 1fr}
+  .two-col,.two-col-recipe{grid-template-columns:1fr}
+  .week-grid{grid-template-columns:repeat(4,1fr)}
+  .plan-summary{grid-template-columns:repeat(2,1fr)}
+  .stores-grid{grid-template-columns:1fr}
+  .hero h1{font-size:36px}
+  .page{padding:1rem}
+}
+@media(max-width:480px){
+  .feature-grid{grid-template-columns:1fr}
+  .week-grid{grid-template-columns:repeat(2,1fr)}
+}
+</style>
 </head>
 <body>
 
+<!-- NAV -->
 <nav>
-    <div class="logo">MealMind <span>Student Planner</span></div>
-    <button class="menu-btn" onclick="toggleMenu()">☰</button>
-    <div class="nav-tabs" id="nav-tabs">
-        <button class="nav-tab active" onclick="showPage('home')">Home</button>
-        <button class="nav-tab" onclick="showPage('generate')">Generate</button>
-        <button class="nav-tab" onclick="showPage('planner')">Weekly Plan</button>
-        <button class="nav-tab" onclick="showPage('stores')">Stores</button>
+  <a href="#" class="logo" onclick="showPage('home');return false">MealMind <span class="logo-sub">AI Meal Planner</span></a>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('home')">Home</button>
+    <button class="nav-tab" onclick="showPage('generate')">Generate</button>
+    <button class="nav-tab" onclick="showPage('planner')">Weekly Plan</button>
+    <button class="nav-tab" onclick="showPage('stores')">Stores</button>
+    <button class="nav-tab" onclick="showPage('chat')">AI Chat</button>
+  </div>
+  <div class="nav-right">
+    <div class="api-indicator" title="Recipe database ready">
+      <div class="api-dot" id="api-dot"></div>
+      <span id="api-status-text">No API key</span>
     </div>
+    <div class="nav-user" onclick="openLoginModal()">
+      <span id="user-label">Sign in</span>
+      <div class="avatar" id="avatar-circle">?</div>
+    </div>
+  </div>
 </nav>
 
+<!-- HOME PAGE -->
 <div class="page active" id="page-home">
-    <div class="hero">
-        <h1>Save money. <em>Eat better.</em></h1>
-        <p>Your budget-friendly AI meal planner tailored for student living.</p>
-        <button class="btn" style="width: auto; margin-top: 2rem; padding: 12px 30px" onclick="showPage('generate')">Get Started</button>
+  <div class="hero">
+    <h1>Stop wondering<br><em>"what's for dinner?"</em></h1>
+    <p>Tell us what's in your fridge. AI builds a full week of budget meals — with cost estimates and local store prices.</p>
+    <div class="cta-row">
+      <button class="cta-btn" onclick="showPage('generate')">Generate my meals →</button>
+      <button class="cta-btn outline" onclick="showPage('chat')">Chat with AI</button>
     </div>
-    <div class="feature-grid">
-        <div class="feat-card"><h3>🛒 Use Pantry</h3><p>Input what you have, we find the recipes.</p></div>
-        <div class="feat-card"><h3>💵 Stay Cheap</h3><p>Average meals under $3.50 per serving.</p></div>
-        <div class="feat-card)<h3>📅 Plan Ahead</h3><p>Auto-generate your shopping list.</p></div>
+  </div>
+  <div class="feature-grid">
+    <div class="feat-card">
+      <div class="feat-icon">🥦</div>
+      <h3>Ingredient-first recipes</h3>
+      <p>Enter what you already have and AI generates recipes that use them — no waste, no extra shopping.</p>
     </div>
+    <div class="feat-card">
+      <div class="feat-icon">💰</div>
+      <h3>Budget tracking</h3>
+      <p>See the estimated cost of every meal and your total weekly grocery bill before you buy anything.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🏪</div>
+      <h3>Local store prices</h3>
+      <p>Enter your zip code and we'll find the cheapest nearby stores for every ingredient on your list.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">📅</div>
+      <h3>Weekly meal planner</h3>
+      <p>AI fills your entire 7-day calendar with balanced, budget-friendly meals in one click.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">💬</div>
+      <h3>AI meal chat</h3>
+      <p>Ask anything — "what can I make with eggs and no dairy?" — and get instant recipe ideas.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🖨️</div>
+      <h3>Print grocery lists</h3>
+      <p>Generate a clean, printable shopping list sorted by store section — great for physical shoppers.</p>
+    </div>
+  </div>
+  <div style="text-align:center;margin-top:3rem;padding:2rem;background:var(--white);border-radius:var(--radius);border:1px solid var(--border)">
+    <h2 style="font-family:var(--font-head);font-size:22px;color:var(--sage);margin-bottom:0.5rem">Ready to go ✦</h2>
+    <p style="color:var(--muted);font-size:14px;max-width:480px;margin:0 auto 1.5rem;line-height:1.6">MealMind uses a built-in recipe database — no internet or API key needed. Just add your ingredients and start finding meals.</p>
+    <button class="cta-btn" onclick="showPage('generate')">Start planning meals →</button>
+  </div>
 </div>
 
+<!-- GENERATE PAGE -->
 <div class="page" id="page-generate">
+  <h1 class="page-title">Generate a recipe</h1>
+  <p class="page-sub">Add ingredients you have on hand, set your preferences, and let AI cook up ideas.</p>
+  <div class="two-col">
     <div class="card">
-        <h3>What's in your fridge?</h3>
-        <p style="color:var(--muted); font-size: 14px; margin-bottom: 1rem;">Add ingredients to see AI suggestions.</p>
-        <input type="text" id="ing-input" placeholder="e.g. Eggs, Pasta, Spinach" onkeydown="if(event.key==='Enter') addIngredient()">
-        <div id="tag-container" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom: 1rem;"></div>
-        <button class="btn" onclick="generateRecipes()">✦ Generate AI Recipes</button>
+      <div class="card-title">Ingredients I have</div>
+      <div class="tag-input-wrap">
+        <input type="text" id="ing-input" placeholder="e.g. chicken, rice, broccoli..." onkeydown="if(event.key==='Enter')addIngredient()">
+        <button class="add-btn" onclick="addIngredient()">Add</button>
+      </div>
+      <div class="tags" id="ing-tags"></div>
+      <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.8px">Quick add</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px" id="quick-tags"></div>
+      </div>
     </div>
-    <div id="recipe-results"></div>
+    <div class="card">
+      <div class="card-title">Preferences</div>
+      <div class="pref-row"><span class="pref-label">Meal type</span><select id="meal-type"><option>Any</option><option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Snack</option></select></div>
+      <div class="pref-row"><span class="pref-label">Dietary restriction</span><select id="diet"><option>None</option><option>Vegetarian</option><option>Vegan</option><option>Gluten-free</option><option>Dairy-free</option><option>Keto</option></select></div>
+      <div class="pref-row"><span class="pref-label">Cook time</span><select id="cook-time"><option>Any</option><option>Under 15 min</option><option>Under 30 min</option><option>Under 1 hour</option></select></div>
+      <div class="pref-row"><span class="pref-label">Budget per meal</span><select id="budget"><option>Any</option><option>Under $3</option><option>Under $5</option><option>Under $8</option><option>Under $12</option></select></div>
+      <div class="pref-row"><span class="pref-label">Servings</span><input type="number" id="servings" value="2" min="1" max="8" style="width:60px"></div>
+      <div class="pref-row"><span class="pref-label">Zip code</span><input type="text" id="gen-zip" placeholder="e.g. 83440" style="width:110px" maxlength="5"></div>
+    </div>
+  </div>
+  <button class="gen-btn" id="gen-btn" onclick="generateRecipe()">✦ Find matching recipes</button>
+  <div id="results-area" style="margin-top:1.5rem"></div>
 </div>
 
+<!-- PLANNER PAGE -->
 <div class="page" id="page-planner">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-        <h2>Weekly Schedule</h2>
-        <button onclick="clearPlan()" style="background:none; border:none; color:var(--amber); cursor:pointer">Clear All</button>
-    </div>
-    <div class="week-grid" id="week-grid"></div>
+  <h1 class="page-title">Weekly meal plan</h1>
+  <p class="page-sub">Your planned meals for the week. Click a slot to edit, or let AI fill the whole week.</p>
+  <div class="plan-summary">
+    <div class="sum-card"><span class="sum-num" id="total-cost">$0</span><div class="sum-label">Est. weekly cost</div></div>
+    <div class="sum-card"><span class="sum-num" id="total-meals">0</span><div class="sum-label">Meals planned</div></div>
+    <div class="sum-card"><span class="sum-num" id="avg-cost">$0</span><div class="sum-label">Avg. per meal</div></div>
+    <div class="sum-card"><span class="sum-num" id="savings">$0</span><div class="sum-label">Est. savings vs eating out</div></div>
+  </div>
+  <div class="week-grid" id="week-grid"></div>
+  <div class="plan-actions">
+    <button class="action-btn primary" id="fill-week-btn" onclick="generateWeekPlan()">✦ AI fill my week</button>
+    <button class="action-btn" onclick="printGroceryList()">🖨 Print grocery list</button>
+    <button class="action-btn" onclick="clearPlan()">✕ Clear plan</button>
+  </div>
+  <div id="grocery-print-area" style="display:none"></div>
 </div>
 
+<!-- STORES PAGE -->
+<div class="page" id="page-stores">
+  <h1 class="page-title">Find nearby stores</h1>
+  <p class="page-sub">Enter your zip code to find the cheapest grocery stores in your area with AI-estimated prices.</p>
+  <div class="zip-row">
+    <input type="text" id="zip-input" placeholder="Enter zip code" maxlength="5" style="width:160px;font-size:15px;letter-spacing:1px">
+    <button class="zip-btn" onclick="findStores()">Search stores</button>
+  </div>
+  <div id="stores-result"></div>
+</div>
+
+<!-- AI CHAT PAGE -->
+<div class="page" id="page-chat">
+  <h1 class="page-title">AI meal assistant</h1>
+  <p class="page-sub">Ask anything about recipes, nutrition, meal planning, or ingredient substitutions.</p>
+  <div class="chat-suggestions">
+    <button class="suggestion-btn" onclick="sendSuggestion('What can I make with eggs, cheese, and spinach?')">🥚 Eggs, cheese & spinach ideas</button>
+    <button class="suggestion-btn" onclick="sendSuggestion('Give me a 3-day meal plan under $20 total')">💵 3-day plan under $20</button>
+    <button class="suggestion-btn" onclick="sendSuggestion('What are the healthiest cheap foods for college students?')">🥗 Healthiest cheap foods</button>
+    <button class="suggestion-btn" onclick="sendSuggestion('How do I meal prep for a whole week in under 2 hours?')">⏱ Quick meal prep tips</button>
+  </div>
+  <div class="chat-wrap">
+    <div class="chat-messages" id="chat-messages">
+      <div class="msg assistant">Hi! I'm your AI meal assistant. Ask me anything — recipes from your ingredients, budget tips, nutrition info, or how to make the most of whatever's in your fridge. 🍳</div>
+    </div>
+    <div class="chat-input-row">
+      <input type="text" id="chat-input" placeholder="Ask me anything about meals, recipes, or nutrition..." onkeydown="if(event.key==='Enter')sendChat()">
+      <button class="chat-send" id="chat-send" onclick="sendChat()">Send</button>
+    </div>
+  </div>
+</div>
+
+<!-- API modal removed: Gemini key is hardcoded -->
+
+<!-- LOGIN MODAL -->
+<div class="modal-bg" id="login-modal" onclick="if(event.target===this)closeLoginModal()">
+  <div class="login-modal modal">
+    <button class="modal-close" onclick="closeLoginModal()">×</button>
+    <h2>Welcome back</h2>
+    <p>Sign in to save your meal plans across sessions. (Demo mode — data is saved locally.)</p>
+    <div class="form-row"><label>Name</label><input type="text" id="login-name" placeholder="Your name"></div>
+    <div class="form-row"><label>Email</label><input type="email" id="login-email" placeholder="you@school.edu"></div>
+    <button class="modal-btn" onclick="doLogin()">Sign in / Sign up</button>
+  </div>
+</div>
+
+<!-- EDIT MEAL MODAL -->
+<div class="modal-bg" id="edit-modal" onclick="if(event.target===this)closeEditModal()">
+  <div class="modal" style="width:360px">
+    <button class="modal-close" onclick="closeEditModal()">×</button>
+    <h2 style="font-size:20px" id="edit-modal-title">Edit meal</h2>
+    <p style="margin-bottom:1rem" id="edit-modal-sub"></p>
+    <div class="form-row"><label>Meal name</label><input type="text" id="edit-meal-name" placeholder="e.g. Chicken stir fry"></div>
+    <div class="form-row"><label>Est. cost ($)</label><input type="number" id="edit-meal-cost" placeholder="4.50" step="0.01" min="0"></div>
+    <button class="modal-btn" onclick="saveEditMeal()">Save meal</button>
+    <button style="width:100%;background:none;border:1px solid var(--border);padding:10px;border-radius:8px;font-family:var(--font-body);font-size:14px;cursor:pointer;color:var(--muted);margin-top:8px" onclick="clearMealSlot()">Remove meal</button>
+  </div>
+</div>
+
+<script src="recipes.js"></script>
 <script>
-    let ingredients = [];
-    let mealPlan = JSON.parse(localStorage.getItem('mealPlan')) || {};
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let ingredients = [];
+let mealPlan = {};
+let chatHistory = [];
+let loggedIn = false;
+let editTarget = null;
 
-    function toggleMenu() {
-        document.getElementById('nav-tabs').classList.toggle('open');
-    }
+const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const SLOTS = ['Breakfast','Lunch','Dinner'];
+const QUICK = ['eggs','pasta','rice','chicken','onion','garlic','tomatoes','cheese','milk','bread','potatoes','carrots','beans','spinach','ground beef'];
 
-    function showPage(p) {
-        document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
-        document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
-        document.getElementById('page-' + p).classList.add('active');
-        document.querySelector(`[onclick="showPage('${p}')"]`).classList.add('active');
-        document.getElementById('nav-tabs').classList.remove('open');
-        if(p === 'planner') renderPlanner();
-    }
+// ─── LOCAL DB ────────────────────────────────────────────────────────────────
+function updateApiStatus(){
+  document.getElementById('api-dot').classList.add('connected');
+  document.getElementById('api-status-text').textContent='Recipe DB ready';
+}
 
-    function addIngredient() {
-        const input = document.getElementById('ing-input');
-        const val = input.value.trim();
-        if(val && !ingredients.includes(val)) {
-            ingredients.push(val);
-            renderTags();
-        }
-        input.value = '';
-    }
+function requireApiKey(){ return true; } // always available — no key needed
 
-    function renderTags() {
-        const container = document.getElementById('tag-container');
-        container.innerHTML = ingredients.map((ing, i) => `
-            <span style="background:var(--sage-pale); padding:6px 12px; border-radius:20px; font-size:12px;">
-                ${ing} <b style="cursor:pointer; margin-left:5px" onclick="ingredients.splice(${i},1);renderTags()">×</b>
-            </span>
-        `).join('');
-    }
+// ─── NAVIGATION ───────────────────────────────────────────────────────────────
+function showPage(p){
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(el=>el.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  const map={home:0,generate:1,planner:2,stores:3,chat:4};
+  const tabs = document.querySelectorAll('.nav-tab');
+  if(map[p]!==undefined) tabs[map[p]].classList.add('active');
+}
 
-    function generateRecipes() {
-        const results = document.getElementById('recipe-results');
-        results.innerHTML = "<p>Analyzing pantry...</p>";
-        
-        // Demo logic for GitHub Pages
-        setTimeout(() => {
-            const mockRecipe = {
-                name: (ingredients[0] || "Pantry") + " Power Bowl",
-                cost: (Math.random() * 4 + 1).toFixed(2),
-                time: "15 min"
-            };
-            results.innerHTML = `
-                <div class="card">
-                    <h4>${mockRecipe.name}</h4>
-                    <p>💰 Est. $${mockRecipe.cost} | ⏱ ${mockRecipe.time}</p>
-                    <button class="btn" style="margin-top:10px; font-size:14px; padding:10px" onclick="addToPlan('${mockRecipe.name}', ${mockRecipe.cost})">Add to Weekly Plan</button>
-                </div>
-            `;
-        }, 800);
-    }
+// ─── MODALS ──────────────────────────────────────────────────────────────────
+function openApiModal(){ /* no-op — no API needed */ }
+function closeApiModal(){}
 
-    function addToPlan(name, cost) {
-        const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-        const day = days[Math.floor(Math.random() * 7)];
-        if(!mealPlan[day]) mealPlan[day] = [];
-        mealPlan[day].push({ name, cost });
-        localStorage.setItem('mealPlan', JSON.stringify(mealPlan));
-        alert(`Saved to ${day}!`);
-    }
+function openLoginModal(){ document.getElementById('login-modal').classList.add('open'); }
+function closeLoginModal(){ document.getElementById('login-modal').classList.remove('open'); }
 
-    function renderPlanner() {
-        const grid = document.getElementById('week-grid');
-        const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-        grid.innerHTML = days.map(d => `
-            <div class="day-col">
-                <div class="day-header">${d}</div>
-                ${(mealPlan[d] || []).map(m => `<div class="meal-entry">${m.name} <br> <small>$${m.cost}</small></div>`).join('')}
-                ${!(mealPlan[d]?.length) ? '<div style="padding:10px; color:#ccc; font-size:10px">Empty</div>' : ''}
-            </div>
-        `).join('');
-    }
+function doLogin(){
+  const name = document.getElementById('login-name').value.trim() || 'Student';
+  loggedIn=true;
+  document.getElementById('user-label').textContent=name;
+  document.getElementById('avatar-circle').textContent=name[0].toUpperCase();
+  closeLoginModal();
+}
 
-    function clearPlan() {
-        if(confirm("Clear your plan?")) {
-            mealPlan = {};
-            localStorage.removeItem('mealPlan');
-            renderPlanner();
-        }
-    }
+function openEditModal(day, slot){
+  editTarget={day,slot};
+  document.getElementById('edit-modal-title').textContent=`${slot} — ${day}`;
+  document.getElementById('edit-modal-sub').textContent='';
+  const existing = mealPlan[day]&&mealPlan[day][slot];
+  document.getElementById('edit-meal-name').value = existing?existing.name:'';
+  document.getElementById('edit-meal-cost').value = existing?existing.cost:'';
+  document.getElementById('edit-modal').classList.add('open');
+}
+function closeEditModal(){ document.getElementById('edit-modal').classList.remove('open'); editTarget=null; }
+
+function saveEditMeal(){
+  if(!editTarget) return;
+  const name = document.getElementById('edit-meal-name').value.trim();
+  const cost = parseFloat(document.getElementById('edit-meal-cost').value)||0;
+  if(!name){ alert('Please enter a meal name'); return; }
+  const {day,slot} = editTarget;
+  if(!mealPlan[day]) mealPlan[day]={};
+  mealPlan[day][slot]={name,cost};
+  savePlan();
+  renderWeekGrid();
+  updateSummary();
+  closeEditModal();
+}
+
+function clearMealSlot(){
+  if(!editTarget) return;
+  const {day,slot}=editTarget;
+  if(mealPlan[day]) delete mealPlan[day][slot];
+  savePlan();
+  renderWeekGrid();
+  updateSummary();
+  closeEditModal();
+}
+
+// ─── INGREDIENTS ─────────────────────────────────────────────────────────────
+function initQuickTags(){
+  const el = document.getElementById('quick-tags');
+  QUICK.forEach(i=>{
+    const b=document.createElement('button');
+    b.className='quick-tag'; b.textContent=i;
+    b.onclick=()=>{ if(!ingredients.includes(i)){ ingredients.push(i); renderTags(); } };
+    el.appendChild(b);
+  });
+}
+
+function addIngredient(){
+  const inp=document.getElementById('ing-input');
+  const val=inp.value.trim().toLowerCase();
+  if(val && !ingredients.includes(val)){ ingredients.push(val); renderTags(); }
+  inp.value='';inp.focus();
+}
+
+function removeIngredient(i){ ingredients.splice(i,1); renderTags(); }
+
+function renderTags(){
+  document.getElementById('ing-tags').innerHTML=ingredients.map((t,i)=>
+    `<span class="tag">${t}<button onclick="removeIngredient(${i})" title="Remove">×</button></span>`
+  ).join('');
+}
+
+// ─── GENERATE RECIPES ────────────────────────────────────────────────────────
+async function generateRecipe(){
+  if(ingredients.length===0){ alert('Please add at least one ingredient!'); return; }
+  const btn=document.getElementById('gen-btn');
+  btn.disabled=true; btn.textContent='Searching...';
+  document.getElementById('results-area').innerHTML='<div class="loading"><div class="spinner"></div><p>Finding matching recipes...</p></div>';
+
+  const diet=document.getElementById('diet').value;
+  const mtype=document.getElementById('meal-type').value;
+  const time=document.getElementById('cook-time').value;
+  const budgetStr=document.getElementById('budget').value;
+
+  // Parse budget ceiling
+  const budgetMap={'Under $3':3,'Under $5':5,'Under $8':8,'Under $12':12};
+  const maxCost = budgetMap[budgetStr] || Infinity;
+
+  // Small delay for UX feel
+  await new Promise(r=>setTimeout(r,400));
+
+  const results = searchRecipes({
+    ingredients,
+    mealType: mtype,
+    dietary: diet,
+    maxCost,
+    maxTime: time,
+    limit: 4
+  });
+
+  if(results.length === 0){
+    document.getElementById('results-area').innerHTML=`<div class="card" style="text-align:center;padding:2rem">
+      <p style="font-size:2rem;margin-bottom:0.5rem">🔍</p>
+      <p style="font-weight:500;margin-bottom:0.5rem">No recipes found</p>
+      <p style="color:var(--muted);font-size:14px">Try removing some filters or adding different ingredients.</p>
+    </div>`;
+  } else {
+    renderRecipes(results);
+  }
+
+  btn.disabled=false; btn.textContent='✦ Find matching recipes';
+}
+
+function renderRecipes(recipes){
+  window._lastRecipes=recipes;
+  document.getElementById('results-area').innerHTML=recipes.map((r,ri)=>`
+  <div class="recipe-card">
+    <div class="recipe-header">
+      <div>
+        <div class="recipe-name">${escHtml(r.name)}</div>
+        <div class="recipe-meta">
+          <span>⏱ ${escHtml(r.cookTime)}</span>
+          <span>👤 ${r.servings} servings</span>
+          <span>${escHtml(r.mealType||'')}</span>
+        </div>
+        <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
+          ${(r.tags||[]).map(t=>`<span class="badge">${escHtml(t)}</span>`).join('')}
+        </div>
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <div class="cost-big">$${(+r.totalCost).toFixed(2)}<small>total · $${(+r.costPerServing).toFixed(2)}/serving</small></div>
+        <button class="action-btn primary" style="margin-top:8px;font-size:12px" onclick="addToPlan('${escAttr(r.name)}','${(+r.totalCost).toFixed(2)}')">+ Add to plan</button>
+      </div>
+    </div>
+    <div class="two-col-recipe">
+      <div>
+        <div class="section-label">Ingredients</div>
+        <ul class="ingredient-list">
+          ${(r.ingredients||[]).map(i=>`<li><span>${escHtml(i.amount)} ${escHtml(i.name)}</span><div class="ing-right"><span class="store-price">$${(+(i.estimatedPrice||0)).toFixed(2)}</span><div class="store-name">${escHtml(i.cheapestStore||'')}</div></div></li>`).join('')}
+        </ul>
+      </div>
+      <div>
+        <div class="section-label">Instructions</div>
+        <ol class="steps-list">${(r.steps||[]).map(s=>`<li>${escHtml(s)}</li>`).join('')}</ol>
+      </div>
+    </div>
+    <div class="recipe-actions">
+      <button class="action-btn primary" onclick="addToPlan('${escAttr(r.name)}','${(+r.totalCost).toFixed(2)}')">📅 Add to plan</button>
+      <button class="action-btn" onclick="printRecipe(${ri})">🖨 Print</button>
+    </div>
+  </div>`).join('');
+}
+
+function addToPlan(name, cost){
+  const day=DAYS[Math.floor(Math.random()*7)];
+  const slot=SLOTS[Math.floor(Math.random()*3)];
+  if(!mealPlan[day]) mealPlan[day]={};
+  mealPlan[day][slot]={name,cost:parseFloat(cost)||0};
+  savePlan(); renderWeekGrid(); updateSummary();
+  showPage('planner');
+}
+
+// ─── WEEK PLANNER ─────────────────────────────────────────────────────────────
+function buildWeekGrid(){
+  const today=new Date().getDay();
+  const todayMap={1:'Mon',2:'Tue',3:'Wed',4:'Thu',5:'Fri',6:'Sat',0:'Sun'};
+  document.getElementById('week-grid').innerHTML=DAYS.map(d=>`
+  <div class="day-col">
+    <div class="day-head${todayMap[today]===d?' today':''}">${d}</div>
+    ${SLOTS.map(s=>`
+    <div class="meal-slot" onclick="openEditModal('${d}','${s}')" id="slot-${d}-${s}">
+      <div class="meal-type">${s}</div>
+      <div class="meal-name-cell empty-slot" id="meal-${d}-${s}">+ add</div>
+    </div>`).join('')}
+  </div>`).join('');
+}
+
+function renderWeekGrid(){
+  DAYS.forEach(d=>{
+    SLOTS.forEach(s=>{
+      const el=document.getElementById('meal-'+d+'-'+s);
+      if(!el) return;
+      const m=mealPlan[d]&&mealPlan[d][s];
+      if(m){
+        el.className='meal-name-cell';
+        el.innerHTML=`${escHtml(m.name)}<div class="meal-cost-cell">$${(+m.cost).toFixed(2)}</div>`;
+      } else {
+        el.className='meal-name-cell empty-slot';
+        el.innerHTML='+ add';
+      }
+    });
+  });
+}
+
+function updateSummary(){
+  let total=0,count=0;
+  DAYS.forEach(d=>{ if(mealPlan[d]) SLOTS.forEach(s=>{ if(mealPlan[d][s]){ count++; total+=(+mealPlan[d][s].cost)||0; } }); });
+  document.getElementById('total-cost').textContent='$'+total.toFixed(2);
+  document.getElementById('total-meals').textContent=count;
+  document.getElementById('avg-cost').textContent=count?'$'+(total/count).toFixed(2):'$0';
+  document.getElementById('savings').textContent='$'+(Math.max(0,count*8.5-total)).toFixed(2);
+}
+
+function savePlan(){ try{ localStorage.setItem('mm_plan',JSON.stringify(mealPlan)); }catch(e){} }
+function loadPlan(){ try{ const d=localStorage.getItem('mm_plan'); if(d) mealPlan=JSON.parse(d); }catch(e){} }
+
+function clearPlan(){ if(confirm('Clear your entire week plan?')){ mealPlan={}; savePlan(); renderWeekGrid(); updateSummary(); } }
+
+async function generateWeekPlan(){
+  const btn=document.getElementById('fill-week-btn');
+  btn.disabled=true; btn.textContent='Filling...';
+  await new Promise(r=>setTimeout(r,300));
+
+  const breakfasts = RECIPE_DB.filter(r=>r.mealType==='Breakfast');
+  const lunches    = RECIPE_DB.filter(r=>r.mealType==='Lunch');
+  const dinners    = RECIPE_DB.filter(r=>r.mealType==='Dinner');
+  const pick = arr => arr[Math.floor(Math.random()*arr.length)];
+
+  mealPlan = {};
+  DAYS.forEach(d=>{
+    const b=pick(breakfasts), l=pick(lunches), di=pick(dinners);
+    mealPlan[d]={
+      Breakfast:{ name:b.name,  cost:b.totalCost  },
+      Lunch:    { name:l.name,  cost:l.totalCost  },
+      Dinner:   { name:di.name, cost:di.totalCost },
+    };
+  });
+  savePlan(); renderWeekGrid(); updateSummary();
+  btn.disabled=false; btn.textContent='✦ Fill my week';
+}
+
+function printGroceryList(){
+  const items=[];
+  DAYS.forEach(d=>{ if(mealPlan[d]) SLOTS.forEach(s=>{ if(mealPlan[d][s]) items.push(`${d} ${s}: ${mealPlan[d][s].name} (~$${(+mealPlan[d][s].cost).toFixed(2)})`); }); });
+  if(!items.length){ alert('No meals planned yet!'); return; }
+  const win=window.open('','_blank');
+  win.document.write(`<html><head><title>MealMind Grocery List</title><style>body{font-family:sans-serif;max-width:600px;margin:2rem auto;line-height:1.7}h1{color:#2D4A3E;border-bottom:2px solid #2D4A3E;padding-bottom:0.5rem}li{margin-bottom:4px}@media print{button{display:none}}</style></head>
+<body><h1>MealMind — Weekly Grocery List</h1><p>Generated ${new Date().toLocaleDateString()}</p><ul>${items.map(i=>`<li>${i}</li>`).join('')}</ul><button onclick="window.print()" style="margin-top:1rem;padding:10px 20px;background:#2D4A3E;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:14px">Print</button></body></html>`);
+  win.document.close();
+}
+
+// ─── STORES ───────────────────────────────────────────────────────────────────
+function findStores(){
+  const zip=document.getElementById('zip-input').value.trim();
+  if(!zip||zip.length<5){ alert('Enter a valid 5-digit zip code'); return; }
+  const el=document.getElementById('stores-result');
+  el.innerHTML='<div class="loading"><div class="spinner"></div><p>Finding stores near '+zip+'...</p></div>';
+  setTimeout(()=>{
+    const stores=[
+      {icon:'🛒',name:'Walmart Supercenter',distance:'varies',address:'Search on Google Maps',tags:['Cheapest overall','Open 24hr','Large selection'],cheapest:true,savings:'Up to 30% cheaper on staples'},
+      {icon:'🏪',name:'Aldi',distance:'varies',address:'Search on Google Maps',tags:['Best produce prices','No-frills','Weekly deals'],cheapest:false,savings:'Great for produce & basics'},
+      {icon:'🛍',name:'Kroger / Smith\'s',distance:'varies',address:'Search on Google Maps',tags:['Loyalty card discounts','Good selection','Fuel points'],cheapest:false,savings:'Loyalty card saves 10–20%'},
+      {icon:'🎯',name:'Target',distance:'varies',address:'Search on Google Maps',tags:['RedCard 5% off','Student deals','Household basics'],cheapest:false,savings:'RedCard saves 5% on everything'},
+    ];
+    el.innerHTML=`<div class="stores-grid">${stores.map(s=>`
+    <div class="store-card">
+      <div class="store-icon">${s.icon}</div>
+      <div class="store-info">
+        <h3>${escHtml(s.name)}</h3>
+        <p>${escHtml(s.address)}</p>
+        ${s.savings?`<p style="font-size:12px;color:var(--amber);margin-bottom:8px">💰 ${escHtml(s.savings)}</p>`:''}
+        <div class="store-tags">
+          ${s.cheapest?'<span class="cheapest-badge">💰 Usually cheapest</span>':''}
+          ${s.tags.map(t=>`<span class="store-tag">${escHtml(t)}</span>`).join('')}
+        </div>
+      </div>
+    </div>`).join('')}</div>
+    <p style="font-size:12px;color:var(--muted);margin-top:1rem;line-height:1.5">Search Google Maps for these stores near zip <strong>${zip}</strong> for exact locations and hours. Prices vary by location.</p>`;
+  }, 600);
+}
+
+// ─── CHAT (LOCAL) ─────────────────────────────────────────────────────────────
+function sendSuggestion(text){
+  document.getElementById('chat-input').value=text;
+  sendChat();
+}
+
+function sendChat(){
+  const input=document.getElementById('chat-input');
+  const msg=input.value.trim();
+  if(!msg) return;
+  input.value='';
+
+  appendChatMsg('user',msg);
+
+  const lower=msg.toLowerCase();
+
+  // Extract ingredients mentioned in message
+  const allIngNames = [...new Set(RECIPE_DB.flatMap(r=>r.ingredients.map(i=>i.name.toLowerCase())))];
+  const mentioned = allIngNames.filter(ing=>lower.includes(ing));
+
+  // Detect meal type
+  let mealType='Any';
+  if(lower.includes('breakfast')) mealType='Breakfast';
+  else if(lower.includes('lunch')) mealType='Lunch';
+  else if(lower.includes('dinner')) mealType='Dinner';
+  else if(lower.includes('snack')) mealType='Snack';
+
+  // Detect dietary
+  let dietary='None';
+  if(lower.includes('vegan')) dietary='Vegan';
+  else if(lower.includes('vegetarian')) dietary='Vegetarian';
+  else if(lower.includes('gluten')) dietary='Gluten-free';
+  else if(lower.includes('dairy')) dietary='Dairy-free';
+
+  // Detect budget
+  let maxCost=Infinity;
+  const budgetMatch=lower.match(/under \$?(\d+)/);
+  if(budgetMatch) maxCost=parseInt(budgetMatch[1]);
+
+  // General tips / keywords
+  if(lower.includes('tip') || lower.includes('advice') || lower.includes('help') || lower.includes('how')){
+    const tips=[
+      "💡 <strong>Meal prep tip:</strong> Cook a big batch of rice and beans on Sunday — they reheat great all week and cost under $5 total.",
+      "💡 <strong>Budget tip:</strong> Eggs are your best friend. Cheap, high-protein, and work for any meal of the day.",
+      "💡 <strong>Grocery tip:</strong> Aldi and Walmart usually have the lowest prices. Buy frozen vegetables over fresh — same nutrition, half the cost.",
+      "💡 <strong>Planning tip:</strong> Plan your meals before you shop, not after. You'll save money by avoiding impulse buys.",
+      "💡 <strong>Storage tip:</strong> Cook once, eat twice. Make extra dinner for tomorrow's lunch — saves time and money.",
+    ];
+    appendChatMsg('assistant', tips[Math.floor(Math.random()*tips.length)]);
+    return;
+  }
+
+  if(lower.includes('cheap') && mentioned.length===0 && mealType==='Any'){
+    const cheap = [...RECIPE_DB].sort((a,b)=>a.totalCost-b.totalCost).slice(0,3);
+    const reply = `Here are the cheapest recipes in the database:<br><br>${cheap.map(r=>`🍽 <strong>${r.name}</strong> — $${r.totalCost.toFixed(2)} total (${r.cookTime})`).join('<br>')}`;
+    appendChatMsg('assistant', reply);
+    return;
+  }
+
+  const results = searchRecipes({ ingredients: mentioned, mealType, dietary, maxCost, limit:3 });
+
+  if(results.length===0){
+    appendChatMsg('assistant', "I couldn't find a perfect match in the database. Try asking about specific ingredients like <em>eggs</em>, <em>chicken</em>, or <em>pasta</em>, or ask for a meal type like <em>breakfast</em> or <em>dinner</em>.");
+    return;
+  }
+
+  const reply = `Here are some recipes that match:<br><br>${results.map(r=>`🍽 <strong>${r.name}</strong><br>&nbsp;&nbsp;⏱ ${r.cookTime} · 💰 $${r.totalCost.toFixed(2)} · ${r.mealType}<br>&nbsp;&nbsp;${r.tags.join(', ')}`).join('<br><br>')}`;
+  appendChatMsg('assistant', reply);
+}
+
+function appendChatMsg(role,text){
+  const el=document.createElement('div');
+  el.className='msg '+role;
+  el.innerHTML=text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+  document.getElementById('chat-messages').appendChild(el);
+  scrollChat();
+}
+
+function scrollChat(){
+  const el=document.getElementById('chat-messages');
+  el.scrollTop=el.scrollHeight;
+}
+
+// ─── PRINT RECIPE ─────────────────────────────────────────────────────────────
+function printRecipe(idx){
+  const r=(window._lastRecipes||[])[idx];
+  if(!r) return;
+  const win=window.open('','_blank');
+  win.document.write(`<html><head><title>${r.name}</title><style>body{font-family:sans-serif;max-width:600px;margin:2rem auto;line-height:1.7}h1{color:#2D4A3E;margin-bottom:0.25rem}h2{color:#2D4A3E;margin-top:1.5rem}ul li,ol li{margin-bottom:4px}.meta{color:#6B8A7A;font-size:14px;margin-bottom:1rem}@media print{button{display:none}}</style></head><body>
+<h1>${r.name}</h1><div class="meta">⏱ ${r.cookTime} &nbsp;·&nbsp; 👤 ${r.servings} servings &nbsp;·&nbsp; 💰 $${(+r.totalCost).toFixed(2)} total ($${(+r.costPerServing).toFixed(2)}/serving)</div>
+<h2>Ingredients</h2><ul>${(r.ingredients||[]).map(i=>`<li>${i.amount} ${i.name} — ~$${(+(i.estimatedPrice||0)).toFixed(2)} (${i.cheapestStore})</li>`).join('')}</ul>
+<h2>Instructions</h2><ol>${(r.steps||[]).map(s=>`<li>${s}</li>`).join('')}</ol>
+<button onclick="window.print()" style="margin-top:1rem;padding:10px 20px;background:#2D4A3E;color:#fff;border:none;border-radius:6px;cursor:pointer">Print</button>
+</body></html>`);
+  win.document.close();
+}
+
+// ─── UTILS ───────────────────────────────────────────────────────────────────
+function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function escAttr(s){ return String(s||'').replace(/'/g,"\\'"); }
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+function init(){
+  initQuickTags();
+  loadPlan();
+  buildWeekGrid();
+  renderWeekGrid();
+  updateSummary();
+  updateApiStatus();
+}
+
+init();
 </script>
 </body>
 </html>
