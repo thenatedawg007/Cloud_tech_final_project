@@ -662,12 +662,121 @@ async function generateWeekPlan(){
 }
 
 function printGroceryList(){
-  const items=[];
-  DAYS.forEach(d=>{ if(mealPlan[d]) SLOTS.forEach(s=>{ if(mealPlan[d][s]) items.push(`${d} ${s}: ${mealPlan[d][s].name} (~$${(+mealPlan[d][s].cost).toFixed(2)})`); }); });
-  if(!items.length){ alert('No meals planned yet!'); return; }
-  const win=window.open('','_blank');
-  win.document.write(`<html><head><title>MealMind Grocery List</title><style>body{font-family:sans-serif;max-width:600px;margin:2rem auto;line-height:1.7}h1{color:#2D4A3E;border-bottom:2px solid #2D4A3E;padding-bottom:0.5rem}li{margin-bottom:4px}@media print{button{display:none}}</style></head>
-<body><h1>MealMind — Weekly Grocery List</h1><p>Generated ${new Date().toLocaleDateString()}</p><ul>${items.map(i=>`<li>${i}</li>`).join('')}</ul><button onclick="window.print()" style="margin-top:1rem;padding:10px 20px;background:#2D4A3E;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:14px">Print</button></body></html>`);
+  if(!Object.keys(mealPlan).length){ alert('No meals planned yet!'); return; }
+
+  // Build meal schedule rows and collect all ingredients
+  const mealRows = [];
+  const ingredientMap = {}; // name → {amount, estimatedPrice, cheapestStore}
+
+  DAYS.forEach(d=>{
+    if(!mealPlan[d]) return;
+    SLOTS.forEach(s=>{
+      const m = mealPlan[d][s];
+      if(!m) return;
+      mealRows.push({ day:d, slot:s, name:m.name, cost:m.cost });
+
+      // Look up recipe in DB to get ingredients
+      const recipe = RECIPE_DB.find(r=>r.name === m.name);
+      if(recipe){
+        recipe.ingredients.forEach(ing=>{
+          const key = ing.name.toLowerCase();
+          if(ingredientMap[key]){
+            // Already listed — just note it's used in multiple meals
+            ingredientMap[key].count++;
+          } else {
+            ingredientMap[key] = {
+              name: ing.name,
+              amount: ing.amount,
+              estimatedPrice: ing.estimatedPrice,
+              cheapestStore: ing.cheapestStore,
+              count: 1
+            };
+          }
+        });
+      }
+    });
+  });
+
+  const totalMealCost = mealRows.reduce((sum,m)=>sum+(+m.cost||0),0);
+  const totalIngCost  = Object.values(ingredientMap).reduce((sum,i)=>sum+(i.estimatedPrice||0),0);
+
+  // Group ingredients by store
+  const byStore = {};
+  Object.values(ingredientMap).forEach(ing=>{
+    const store = ing.cheapestStore || 'Other';
+    if(!byStore[store]) byStore[store]=[];
+    byStore[store].push(ing);
+  });
+
+  const storeHTML = Object.entries(byStore).map(([store,ings])=>`
+    <h3 style="color:#2D4A3E;margin:1.5rem 0 0.5rem;border-bottom:1px solid #D4E0D8;padding-bottom:4px">🏪 ${store}</h3>
+    <table style="width:100%;border-collapse:collapse;font-size:14px">
+      <tr style="color:#6B8A7A;font-size:12px;text-transform:uppercase;letter-spacing:0.5px">
+        <th style="text-align:left;padding:4px 8px">☐</th>
+        <th style="text-align:left;padding:4px 8px">Item</th>
+        <th style="text-align:left;padding:4px 8px">Amount</th>
+        <th style="text-align:right;padding:4px 8px">Est. Price</th>
+      </tr>
+      ${ings.map(i=>`<tr style="border-bottom:1px solid #f0f0f0">
+        <td style="padding:6px 8px">☐</td>
+        <td style="padding:6px 8px">${i.name}${i.count>1?` <span style="color:#6B8A7A;font-size:11px">(×${i.count} meals)</span>`:''}</td>
+        <td style="padding:6px 8px;color:#6B8A7A">${i.amount}</td>
+        <td style="padding:6px 8px;text-align:right;color:#C8860A">$${(i.estimatedPrice||0).toFixed(2)}</td>
+      </tr>`).join('')}
+    </table>`).join('');
+
+  const mealScheduleHTML = `
+    <table style="width:100%;border-collapse:collapse;font-size:14px;margin-top:0.5rem">
+      <tr style="background:#2D4A3E;color:#fff">
+        <th style="padding:8px;text-align:left">Day</th>
+        <th style="padding:8px;text-align:left">Meal</th>
+        <th style="padding:8px;text-align:left">Recipe</th>
+        <th style="padding:8px;text-align:right">Cost</th>
+      </tr>
+      ${mealRows.map((m,i)=>`<tr style="background:${i%2===0?'#fff':'#f9faf9'}">
+        <td style="padding:7px 8px">${m.day}</td>
+        <td style="padding:7px 8px;color:#6B8A7A">${m.slot}</td>
+        <td style="padding:7px 8px">${m.name}</td>
+        <td style="padding:7px 8px;text-align:right;color:#C8860A">$${(+m.cost||0).toFixed(2)}</td>
+      </tr>`).join('')}
+      <tr style="background:#E8F0EC;font-weight:bold">
+        <td colspan="3" style="padding:8px">Total estimated weekly cost</td>
+        <td style="padding:8px;text-align:right;color:#2D4A3E">$${totalMealCost.toFixed(2)}</td>
+      </tr>
+    </table>`;
+
+  const win = window.open('','_blank');
+  win.document.write(`<!DOCTYPE html><html><head><title>MealMind Grocery List</title>
+<style>
+  body{font-family:'Segoe UI',sans-serif;max-width:680px;margin:2rem auto;color:#1A2B24;padding:0 1rem}
+  h1{color:#2D4A3E;font-size:26px;margin-bottom:0.25rem}
+  h2{color:#2D4A3E;font-size:18px;margin:2rem 0 0.75rem;border-bottom:2px solid #2D4A3E;padding-bottom:6px}
+  .meta{color:#6B8A7A;font-size:13px;margin-bottom:2rem}
+  .summary{display:flex;gap:2rem;background:#E8F0EC;padding:1rem;border-radius:8px;margin-bottom:2rem}
+  .sum-item{text-align:center}
+  .sum-num{font-size:22px;font-weight:bold;color:#2D4A3E;display:block}
+  .sum-label{font-size:11px;color:#6B8A7A;text-transform:uppercase;letter-spacing:0.5px}
+  .print-btn{margin-top:2rem;padding:10px 24px;background:#2D4A3E;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:14px}
+  @media print{.print-btn{display:none}body{margin:0.5rem}}
+</style></head><body>
+<h1>🌿 MealMind — Weekly Grocery List</h1>
+<div class="meta">Generated ${new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}</div>
+
+<div class="summary">
+  <div class="sum-item"><span class="sum-num">${mealRows.length}</span><span class="sum-label">Meals planned</span></div>
+  <div class="sum-item"><span class="sum-num">$${totalMealCost.toFixed(2)}</span><span class="sum-label">Est. meal cost</span></div>
+  <div class="sum-item"><span class="sum-num">${Object.keys(ingredientMap).length}</span><span class="sum-label">Unique ingredients</span></div>
+  <div class="sum-item"><span class="sum-num">$${totalIngCost.toFixed(2)}</span><span class="sum-label">Est. ingredient cost</span></div>
+</div>
+
+<h2>📅 Meal Schedule</h2>
+${mealScheduleHTML}
+
+<h2>🛒 Shopping List by Store</h2>
+${storeHTML}
+
+<button class="print-btn" onclick="window.print()">🖨 Print this list</button>
+</body></html>`);
   win.document.close();
 }
 
