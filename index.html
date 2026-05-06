@@ -625,12 +625,40 @@ function renderWeekGrid(){
 }
 
 function updateSummary(){
-  let total=0,count=0;
-  DAYS.forEach(d=>{ if(mealPlan[d]) SLOTS.forEach(s=>{ if(mealPlan[d][s]){ count++; total+=(+mealPlan[d][s].cost)||0; } }); });
-  document.getElementById('total-cost').textContent='$'+total.toFixed(2);
-  document.getElementById('total-meals').textContent=count;
-  document.getElementById('avg-cost').textContent=count?'$'+(total/count).toFixed(2):'$0';
-  document.getElementById('savings').textContent='$'+(Math.max(0,count*8.5-total)).toFixed(2);
+  let totalMealPortionCost = 0;
+  let count = 0;
+  const uniqueIngredients = new Map();
+
+  DAYS.forEach(d => {
+    if (mealPlan[d]) {
+      SLOTS.forEach(s => {
+        if (mealPlan[d][s]) {
+          count++;
+          totalMealPortionCost += (+mealPlan[d][s].cost) || 0;
+
+          // Look up the recipe to find its full product costs
+          const recipe = RECIPE_DB.find(r => r.name === mealPlan[d][s].name);
+          if (recipe) {
+            recipe.ingredients.forEach(ing => {
+              // We use the name as a key to avoid double-counting the same product
+              if (!uniqueIngredients.has(ing.name.toLowerCase())) {
+                uniqueIngredients.set(ing.name.toLowerCase(), ing.estimatedPrice || 0);
+              }
+            });
+          }
+        }
+      });
+    }
+  });
+
+  // Calculate the total based on full products needed
+  let totalProductCost = 0;
+  uniqueIngredients.forEach(price => totalProductCost += price);
+
+  document.getElementById('total-cost').textContent = '$' + totalProductCost.toFixed(2);
+  document.getElementById('total-meals').textContent = count;
+  document.getElementById('avg-cost').textContent = count ? '$' + (totalProductCost / count).toFixed(2) : '$0';
+  document.getElementById('savings').textContent = '$' + (Math.max(0, count * 8.5 - totalProductCost)).toFixed(2);
 }
 
 function savePlan(){ try{ localStorage.setItem('mm_plan',JSON.stringify(mealPlan)); }catch(e){} }
